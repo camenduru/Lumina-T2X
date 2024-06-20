@@ -297,18 +297,18 @@ def main(args):
 
     logger.info("Training arguments: " + json.dumps(args.__dict__, indent=2))
 
-    logger.info(f"Setting-up language model: google/gemma-2b")
+    logger.info(f"Setting-up language model: 4bit/gemma-2b")
 
     # create tokenizers
     # Load the tokenizers
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2b")
+    tokenizer = AutoTokenizer.from_pretrained("4bit/gemma-2b")
     tokenizer.padding_side = "right"
 
     # create text encoders
     # text_encoder
     text_encoder = (
         AutoModelForCausalLM.from_pretrained(
-            "google/gemma-2b",
+            "4bit/gemma-2b",
             torch_dtype=torch.bfloat16,
         )
         .get_decoder()

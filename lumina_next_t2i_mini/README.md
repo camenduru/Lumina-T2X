@@ -19,8 +19,8 @@ More checkpoints of our model will be released soon~
 
 | Model | Resolution | Next-DiT Parameter| Text Encoder | Download URL  |
 | ---------- | ---------- | ----------------------- | ------------ |-------------- |
-| Lumina-Next-T2I | 1024       | 2B             |    [Gemma-2B](https://huggingface.co/google/gemma-2b)  | [hugging face](https://huggingface.co/Alpha-VLLM/Lumina-Next-T2I) |
-| Lumina-Next-SFT | 1024       | 2B             |    [Gemma-2B](https://huggingface.co/google/gemma-2b)  | [hugging face](https://huggingface.co/Alpha-VLLM/Lumina-Next-SFT) |
+| Lumina-Next-T2I | 1024       | 2B             |    [Gemma-2B](https://huggingface.co/4bit/gemma-2b)  | [hugging face](https://huggingface.co/Alpha-VLLM/Lumina-Next-T2I) |
+| Lumina-Next-SFT | 1024       | 2B             |    [Gemma-2B](https://huggingface.co/4bit/gemma-2b)  | [hugging face](https://huggingface.co/Alpha-VLLM/Lumina-Next-SFT) |
 
 ## Installation
 
