@@ -15,12 +15,12 @@ from typing import List, Optional, Tuple
 
 from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input  # noqa
 
-try:
-    from flash_attn import flash_attn_varlen_func
+# try:
+#     from flash_attn import flash_attn_varlen_func
 
-    is_flash_attn = True
-except:
-    is_flash_attn = False
+#     is_flash_attn = True
+# except:
+#     is_flash_attn = False
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -331,51 +331,51 @@ class Attention(nn.Module):
         else:
             softmax_scale = math.sqrt(1 / self.head_dim)
 
-        if self.use_flash_attn and dtype in [torch.float16, torch.bfloat16]:
-            # begin var_len flash attn
-            (
-                query_states,
-                key_states,
-                value_states,
-                indices_q,
-                cu_seq_lens,
-                max_seq_lens,
-            ) = self._upad_input(xq, xk, xv, x_mask, seqlen)
+        # if self.use_flash_attn and dtype in [torch.float16, torch.bfloat16]:
+        #     # begin var_len flash attn
+        #     (
+        #         query_states,
+        #         key_states,
+        #         value_states,
+        #         indices_q,
+        #         cu_seq_lens,
+        #         max_seq_lens,
+        #     ) = self._upad_input(xq, xk, xv, x_mask, seqlen)
 
-            cu_seqlens_q, cu_seqlens_k = cu_seq_lens
-            max_seqlen_in_batch_q, max_seqlen_in_batch_k = max_seq_lens
+        #     cu_seqlens_q, cu_seqlens_k = cu_seq_lens
+        #     max_seqlen_in_batch_q, max_seqlen_in_batch_k = max_seq_lens
 
-            attn_output_unpad = flash_attn_varlen_func(
-                query_states,
-                key_states,
-                value_states,
-                cu_seqlens_q=cu_seqlens_q,
-                cu_seqlens_k=cu_seqlens_k,
-                max_seqlen_q=max_seqlen_in_batch_q,
-                max_seqlen_k=max_seqlen_in_batch_k,
-                dropout_p=0.0,
-                causal=False,
-                softmax_scale=softmax_scale,
+        #     attn_output_unpad = flash_attn_varlen_func(
+        #         query_states,
+        #         key_states,
+        #         value_states,
+        #         cu_seqlens_q=cu_seqlens_q,
+        #         cu_seqlens_k=cu_seqlens_k,
+        #         max_seqlen_q=max_seqlen_in_batch_q,
+        #         max_seqlen_k=max_seqlen_in_batch_k,
+        #         dropout_p=0.0,
+        #         causal=False,
+        #         softmax_scale=softmax_scale,
+        #     )
+        #     output = pad_input(attn_output_unpad, indices_q, bsz, seqlen)
+        #     # end var_len_flash_attn
+
+        # else:
+        n_rep = self.n_local_heads // self.n_local_kv_heads
+        if n_rep >= 1:
+            xk = xk.unsqueeze(3).repeat(1, 1, 1, n_rep, 1).flatten(2, 3)
+            xv = xv.unsqueeze(3).repeat(1, 1, 1, n_rep, 1).flatten(2, 3)
+        output = (
+            F.scaled_dot_product_attention(
+                xq.permute(0, 2, 1, 3),
+                xk.permute(0, 2, 1, 3),
+                xv.permute(0, 2, 1, 3),
+                attn_mask=x_mask.bool().view(bsz, 1, 1, seqlen).expand(-1, self.n_local_heads, seqlen, -1),
+                scale=softmax_scale,
             )
-            output = pad_input(attn_output_unpad, indices_q, bsz, seqlen)
-            # end var_len_flash_attn
-
-        else:
-            n_rep = self.n_local_heads // self.n_local_kv_heads
-            if n_rep >= 1:
-                xk = xk.unsqueeze(3).repeat(1, 1, 1, n_rep, 1).flatten(2, 3)
-                xv = xv.unsqueeze(3).repeat(1, 1, 1, n_rep, 1).flatten(2, 3)
-            output = (
-                F.scaled_dot_product_attention(
-                    xq.permute(0, 2, 1, 3),
-                    xk.permute(0, 2, 1, 3),
-                    xv.permute(0, 2, 1, 3),
-                    attn_mask=x_mask.bool().view(bsz, 1, 1, seqlen).expand(-1, self.n_local_heads, seqlen, -1),
-                    scale=softmax_scale,
-                )
-                .permute(0, 2, 1, 3)
-                .to(dtype)
-            )
+            .permute(0, 2, 1, 3)
+            .to(dtype)
+        )
 
         if hasattr(self, "wk_y"):
             yk = self.ky_norm(self.wk_y(y)).view(bsz, -1, self.n_local_kv_heads, self.head_dim)
