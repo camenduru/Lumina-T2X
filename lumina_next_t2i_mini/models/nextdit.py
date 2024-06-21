@@ -13,7 +13,6 @@ import functools
 import math
 from typing import List, Optional, Tuple
 
-# from flash_attn import flash_attn_varlen_func
 from flash_attn.flash_attn_interface import flash_attn_unpadded_func
 from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input  # noqa
 import torch
