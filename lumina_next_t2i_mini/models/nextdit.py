@@ -13,8 +13,14 @@ import functools
 import math
 from typing import List, Optional, Tuple
 
-from flash_attn import flash_attn_varlen_func
 from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input  # noqa
+
+try:
+    from flash_attn import flash_attn_varlen_func
+
+    is_flash_attn = True
+except:
+    is_flash_attn = False
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -171,7 +177,7 @@ class Attention(nn.Module):
         # for proportional attention computation
         self.base_seqlen = None
         self.proportional_attn = False
-        self.use_flash_attn = True
+        self.use_flash_attn = False
 
     @staticmethod
     def reshape_for_broadcast(freqs_cis: torch.Tensor, x: torch.Tensor):
@@ -634,7 +640,7 @@ class NextDiT(nn.Module):
         qk_norm: bool = False,
         cap_feat_dim: int = 5120,
         scale_factor: float = 1.0,
-        use_flash_attn: bool = True,
+        use_flash_attn: bool = False,
     ) -> None:
         super().__init__()
         self.learn_sigma = learn_sigma
