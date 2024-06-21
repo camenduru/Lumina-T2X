@@ -105,10 +105,10 @@ def main(args, rank, master_port):
 
     dtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[args.precision]
 
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2b", add_eos=True)
+    tokenizer = AutoTokenizer.from_pretrained("4bit/gemma-2b", add_eos=True)
     tokenizer.padding_side = "right"
 
-    text_encoder = AutoModel.from_pretrained("google/gemma-2b", torch_dtype=dtype, device_map="cuda").eval()
+    text_encoder = AutoModel.from_pretrained("4bit/gemma-2b", torch_dtype=dtype, device_map="cuda").eval()
     # Load scheduler and models
     cap_feat_dim = text_encoder.config.hidden_size
 

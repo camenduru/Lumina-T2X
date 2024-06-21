@@ -81,12 +81,12 @@ def main(args, rank, master_port):
 
     dtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[args.precision]
 
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2b")
+    tokenizer = AutoTokenizer.from_pretrained("4bit/gemma-2b")
     tokenizer.padding_side = "right"
 
     text_encoder = (
         AutoModel.from_pretrained(
-            "google/gemma-2b",
+            "4bit/gemma-2b",
             torch_dtype=dtype,
         )
         .eval()

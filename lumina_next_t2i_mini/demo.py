@@ -94,13 +94,13 @@ def model_main(args, master_port, rank, request_queue, response_queue, mp_barrie
     dtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[args.precision]
 
     text_encoder = AutoModel.from_pretrained(
-        "google/gemma-2b", torch_dtype=dtype, device_map="cuda", token=args.hf_token
+        "4bit/gemma-2b", torch_dtype=dtype, device_map="cuda", token=args.hf_token
     ).eval()
     cap_feat_dim = text_encoder.config.hidden_size
     if args.num_gpus > 1:
         raise NotImplementedError("Inference with >1 GPUs not yet supported")
 
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2b", token=args.hf_token)
+    tokenizer = AutoTokenizer.from_pretrained("4bit/gemma-2b", token=args.hf_token)
     tokenizer.padding_side = "right"
 
     if dist.get_rank() == 0:
@@ -481,6 +481,7 @@ def main():
     mp_barrier.wait()
     demo.queue().launch(
         server_name="0.0.0.0",
+        share=True
     )
 
 
