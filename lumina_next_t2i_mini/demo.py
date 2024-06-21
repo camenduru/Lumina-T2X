@@ -481,7 +481,7 @@ def main():
     mp_barrier.wait()
     demo.queue().launch(
         server_name="0.0.0.0",
-        shasharre=True
+        share=True
     )
 
 
