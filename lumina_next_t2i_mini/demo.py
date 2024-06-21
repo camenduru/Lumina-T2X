@@ -247,7 +247,7 @@ def main():
     parser.add_argument("--num_gpus", type=int, default=1)
     parser.add_argument("--ckpt", type=str, required=True)
     parser.add_argument("--ema", action="store_true")
-    parser.add_argument("--precision", default="bf16", choices=["bf16", "fp32"])
+    parser.add_argument("--precision", default="fp16", choices=["fp16", "bf16", "fp32"])
     parser.add_argument("--hf_token", type=str, default=None, help="huggingface read token for accessing gated repo.")
     parser.add_argument("--use_flash_attn", type=bool, default=True, help="Use flash attention for the model.")
 
